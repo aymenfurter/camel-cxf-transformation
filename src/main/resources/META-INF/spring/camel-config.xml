@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+
+  <context:property-placeholder location="classpath:incident.properties,file:target/custom.properties"
+                                ignore-resource-not-found="true"/>
+
+  <bean id="cxfWsPostProcessor" class="org.apache.camel.example.cxf.mock.CXFWebservicePostProcessor"/>
+  <bean id="cxfWsPreProcessor" class="org.apache.camel.example.cxf.mock.CXFWebservicePreProcessor"/>
+	
+	
+	
+  <cxf:cxfEndpoint id="reportIncident"
+                   address="http://localhost:${proxy.port}/camel-example-cxf-mock/webservices/incident"
+                   endpointName="s:ReportIncidentEndpoint"
+                   serviceName="s:ReportIncidentEndpointService"
+                   serviceClass="org.apache.camel.example.reportincident.ReportIncidentEndpoint"
+                   wsdlURL="etc/report_incident.wsdl"
+                   xmlns:s="http://reportincident.example.camel.apache.org"/>
+                   
+  <cxf:cxfEndpoint id="reportIncidentLegacy"
+                   address="http://localhost:8080/service"
+                   endpointName="s:ReportIncidentLegacyEndpoint"
+                   serviceName="s:ReportIncidentEndpointServiceLegacy"
+                   serviceClass="org.apache.camel.example.reportincident.ReportIncidentEndpointLegacy"
+                   wsdlURL="etc/report_incident_legacy.wsdl"
+                   xmlns:s="http://reportincident.example.camel.apache.org"/>
+
+  <camelContext xmlns="http://camel.apache.org/schema/spring">
+
+    <propertyPlaceholder id="properties" location="classpath:incident.properties,file:target/custom.properties"/>
+
+    <route>
+      <from uri="cxf:bean:reportIncident"/>      
+      <process ref="cxfWsPreProcessor"/>
+      <to uri="cxf:bean:reportIncidentLegacy"/>
+      <process ref="cxfWsPostProcessor"/>
+      <to uri="log:output"/>
+    </route>
+
+  </camelContext>
+
+</beans>

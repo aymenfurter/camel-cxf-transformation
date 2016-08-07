@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://reportincident.example.camel.apache.org"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	targetNamespace="http://reportincident.example.camel.apache.org">
+
+    <!-- Type definitions for input- and output parameters for webservice -->
+    <wsdl:types>
+        <xs:schema targetNamespace="http://reportincident.example.camel.apache.org">
+            <xs:element name="inputReportIncidentLegacy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="xs:string" name="incidentIdLegacy"/>
+                        <xs:element type="xs:string" name="incidentDateLegacy"/>
+                        <xs:element type="xs:string" name="givenNameLegacy"/>
+                        <xs:element type="xs:string" name="familyNameLegacy"/>
+                        <xs:element type="xs:string" name="summaryLegacy"/>
+                        <xs:element type="xs:string" name="detailsLegacy"/>
+                        <xs:element type="xs:string" name="emailLegacy"/>
+                        <xs:element type="xs:string" name="phoneLegacy"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="outputReportIncidentLegacy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="xs:string" name="codeLegacy"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+
+    <!-- Message definitions for input and output -->
+    <wsdl:message name="inputReportIncidentLegacy">
+        <wsdl:part name="in" element="tns:inputReportIncidentLegacy"/>
+    </wsdl:message>
+    <wsdl:message name="outputReportIncidentLegacy">
+        <wsdl:part name="out" element="tns:outputReportIncidentLegacy"/>
+    </wsdl:message>
+
+    <!-- Port (interface) definitions -->
+    <wsdl:portType name="ReportIncidentEndpointLegacy">
+        <wsdl:operation name="ReportIncidentLegacy">
+            <wsdl:input message="tns:inputReportIncidentLegacy"/>
+            <wsdl:output message="tns:outputReportIncidentLegacy"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <!-- Port bindings to transports and encoding - HTTP, document literal encoding is used -->
+    <wsdl:binding name="ReportIncidentLegacyBinding" type="tns:ReportIncidentEndpointLegacy">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="ReportIncidentLegacy">
+            <soap:operation
+                    soapAction="http://reportincident.example.camel.apache.org/ReportIncidentLegacy"
+                    style="document"/>
+            <wsdl:input>
+                <soap:body parts="in" use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body parts="out" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <!-- Service definition -->
+    <wsdl:service name="ReportIncidentEndpointServiceLegacy">
+        <wsdl:port name="ReportIncidentLegacyEndpoint" binding="tns:ReportIncidentLegacyBinding">
+            <soap:address location="http://localhost:9080/camel-example-cxf-proxy/webservices/incident"/>
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>
